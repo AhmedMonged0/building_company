@@ -66,20 +66,46 @@ const dots = document.querySelectorAll('.slider-controls .dot');
 let currentSlide = 0;
 let sliderInterval;
 
+// Lazy load video function
+function loadVideo(video) {
+  if (video.dataset.src && !video.src) {
+    video.src = video.dataset.src;
+    video.load();
+  }
+}
+
 function showSlide(idx) {
   slides.forEach((slide, i) => {
     slide.classList.toggle('active', i === idx);
     // Handle video playback
     if (slide.tagName === 'VIDEO') {
       if (i === idx) {
-        slide.currentTime = 0; // Reset video to start
-        slide.play();
+        // Load video if not loaded yet
+        loadVideo(slide);
+        
+        // Play video when ready
+        if (slide.readyState >= 3) {
+          slide.currentTime = 0;
+          slide.play();
+        } else {
+          slide.addEventListener('canplay', () => {
+            slide.currentTime = 0;
+            slide.play();
+          }, { once: true });
+        }
       } else {
         slide.pause();
-        slide.currentTime = 0; // Reset video when not active
+        slide.currentTime = 0;
       }
     }
   });
+  
+  // Preload next video
+  const nextIdx = (idx + 1) % slides.length;
+  if (slides[nextIdx] && slides[nextIdx].tagName === 'VIDEO') {
+    loadVideo(slides[nextIdx]);
+  }
+  
   dots.forEach((dot, i) => {
     dot.classList.toggle('active', i === idx);
   });
@@ -103,8 +129,31 @@ dots.forEach((dot, i) => {
   });
 });
 if (slides.length) {
-  showSlide(0);
-  startSlider();
+  const loadingIndicator = document.querySelector('.loading-indicator');
+  
+  // Hide loading indicator when first video is ready
+  const firstVideo = slides[0];
+  if (firstVideo && firstVideo.tagName === 'VIDEO') {
+    firstVideo.addEventListener('canplay', () => {
+      if (loadingIndicator) {
+        loadingIndicator.classList.add('hidden');
+      }
+      showSlide(0);
+      startSlider();
+    }, { once: true });
+    
+    // Fallback: hide loading after 3 seconds
+    setTimeout(() => {
+      if (loadingIndicator) {
+        loadingIndicator.classList.add('hidden');
+      }
+      showSlide(0);
+      startSlider();
+    }, 3000);
+  } else {
+    showSlide(0);
+    startSlider();
+  }
   
   // Handle video events
   const videoSlides = document.querySelectorAll('.hero-slider video');
@@ -116,12 +165,13 @@ if (slides.length) {
       }
     });
     
-    // Preload videos for smoother transitions
-    video.preload = 'metadata';
-    
     // Handle video errors
     video.addEventListener('error', (e) => {
       console.log(`Error loading video ${index + 1}:`, e);
+      // Hide loading indicator on error
+      if (loadingIndicator) {
+        loadingIndicator.classList.add('hidden');
+      }
     });
   });
 }
