@@ -69,16 +69,6 @@ let sliderInterval;
 function showSlide(idx) {
   slides.forEach((slide, i) => {
     slide.classList.toggle('active', i === idx);
-    // Handle video playback
-    if (slide.tagName === 'VIDEO') {
-      if (i === idx) {
-        slide.currentTime = 0;
-        slide.play();
-      } else {
-        slide.pause();
-        slide.currentTime = 0;
-      }
-    }
   });
   
   dots.forEach((dot, i) => {
