@@ -75,13 +75,33 @@ function showSlide(idx) {
     dot.classList.toggle('active', i === idx);
   });
   currentSlide = idx;
+  
+  // إعادة تشغيل الفيديو إذا كان العنصر النشط فيديو
+  const activeSlide = slides[idx];
+  if (activeSlide && activeSlide.tagName === 'VIDEO') {
+    activeSlide.currentTime = 0;
+    activeSlide.play();
+  }
 }
 function nextSlide() {
   let next = (currentSlide + 1) % slides.length;
   showSlide(next);
 }
 function startSlider() {
-  sliderInterval = setInterval(nextSlide, 5000);
+  stopSlider(); // إيقاف أي مؤقت سابق
+  
+  const currentSlideElement = slides[currentSlide];
+  let duration = 5000; // المدة الافتراضية
+  
+  // إذا كان العنصر الحالي فيديو ولديه مدة محددة
+  if (currentSlideElement && currentSlideElement.tagName === 'VIDEO') {
+    const videoDuration = currentSlideElement.getAttribute('data-duration');
+    if (videoDuration) {
+      duration = parseInt(videoDuration) * 1000; // تحويل إلى ميلي ثانية
+    }
+  }
+  
+  sliderInterval = setInterval(nextSlide, duration);
 }
 function stopSlider() {
   clearInterval(sliderInterval);
@@ -89,8 +109,7 @@ function stopSlider() {
 dots.forEach((dot, i) => {
   dot.addEventListener('click', () => {
     showSlide(i);
-    stopSlider();
-    startSlider();
+    startSlider(); // سيتم إيقاف المؤقت السابق تلقائياً
   });
 });
 if (slides.length) {
@@ -240,7 +259,6 @@ if (sliderContainer) {
     const diff = startX - endX;
     
     if (Math.abs(diff) > threshold) {
-      stopSlider();
       if (diff > 0) {
         // Swipe left - next slide
         nextSlide();
@@ -249,7 +267,7 @@ if (sliderContainer) {
         let prev = (currentSlide - 1 + slides.length) % slides.length;
         showSlide(prev);
       }
-      startSlider();
+      startSlider(); // سيتم إيقاف المؤقت السابق تلقائياً
     }
   }
 }
@@ -393,8 +411,7 @@ dots.forEach((dot, i) => {
   dot.addEventListener('click', () => {
     const slideIndex = parseInt(dot.dataset.slide);
     showSlide(slideIndex);
-    stopSlider();
-    startSlider();
+    startSlider(); // سيتم إيقاف المؤقت السابق تلقائياً
   });
 });
 
