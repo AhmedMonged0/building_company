@@ -60,61 +60,13 @@ if (aboutContents.length) {
   });
 }
 
-// Hero slider logic
-const slides = document.querySelectorAll('.hero-slider .slide');
-const dots = document.querySelectorAll('.slider-controls .dot');
-let currentSlide = 0;
-let sliderInterval;
-
-function showSlide(idx) {
-  slides.forEach((slide, i) => {
-    slide.classList.toggle('active', i === idx);
+// Hero video - single video without slider logic
+const video = document.querySelector('.hero-slider video');
+if (video) {
+  // تأكد من أن الفيديو يعمل بشكل طبيعي
+  video.addEventListener('loadeddata', function() {
+    this.play();
   });
-  
-  dots.forEach((dot, i) => {
-    dot.classList.toggle('active', i === idx);
-  });
-  currentSlide = idx;
-  
-  // إعادة تشغيل الفيديو إذا كان العنصر النشط فيديو
-  const activeSlide = slides[idx];
-  if (activeSlide && activeSlide.tagName === 'VIDEO') {
-    activeSlide.currentTime = 0;
-    activeSlide.play();
-  }
-}
-function nextSlide() {
-  let next = (currentSlide + 1) % slides.length;
-  showSlide(next);
-}
-function startSlider() {
-  stopSlider(); // إيقاف أي مؤقت سابق
-  
-  const currentSlideElement = slides[currentSlide];
-  let duration = 5000; // المدة الافتراضية
-  
-  // إذا كان العنصر الحالي فيديو ولديه مدة محددة
-  if (currentSlideElement && currentSlideElement.tagName === 'VIDEO') {
-    const videoDuration = currentSlideElement.getAttribute('data-duration');
-    if (videoDuration) {
-      duration = parseInt(videoDuration) * 1000; // تحويل إلى ميلي ثانية
-    }
-  }
-  
-  sliderInterval = setInterval(nextSlide, duration);
-}
-function stopSlider() {
-  clearInterval(sliderInterval);
-}
-dots.forEach((dot, i) => {
-  dot.addEventListener('click', () => {
-    showSlide(i);
-    startSlider(); // سيتم إيقاف المؤقت السابق تلقائياً
-  });
-});
-if (slides.length) {
-  showSlide(0);
-  startSlider();
 }
 
 // Navbar background on scroll
@@ -239,38 +191,7 @@ scrollToTopBtn.addEventListener('click', function() {
   });
 });
 
-// Enhanced slider with touch support
-let startX = 0;
-let endX = 0;
-
-const sliderContainer = document.querySelector('.hero-slider');
-if (sliderContainer) {
-  sliderContainer.addEventListener('touchstart', function(e) {
-    startX = e.touches[0].clientX;
-  });
-
-  sliderContainer.addEventListener('touchend', function(e) {
-    endX = e.changedTouches[0].clientX;
-    handleSwipe();
-  });
-
-  function handleSwipe() {
-    const threshold = 50;
-    const diff = startX - endX;
-    
-    if (Math.abs(diff) > threshold) {
-      if (diff > 0) {
-        // Swipe left - next slide
-        nextSlide();
-      } else {
-        // Swipe right - previous slide
-        let prev = (currentSlide - 1 + slides.length) % slides.length;
-        showSlide(prev);
-      }
-      startSlider(); // سيتم إيقاف المؤقت السابق تلقائياً
-    }
-  }
-}
+// Touch support removed - single video only
 
 // Hero elements are now part of the hero section and scroll naturally
 
@@ -406,14 +327,7 @@ if (heroStats) {
   heroStatsObserver.observe(heroStats);
 }
 
-// Enhanced dot navigation with data attributes
-dots.forEach((dot, i) => {
-  dot.addEventListener('click', () => {
-    const slideIndex = parseInt(dot.dataset.slide);
-    showSlide(slideIndex);
-    startSlider(); // سيتم إيقاف المؤقت السابق تلقائياً
-  });
-});
+// Dot navigation removed - single video only
 
 // Smooth reveal animations for sections
 function revealOnScroll() {
