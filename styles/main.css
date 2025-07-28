@@ -187,9 +187,9 @@ header.scrolled .nav-links li a.active {
   object-fit: cover;
   left: 0;
   top: 0;
-  opacity: 0;
+  opacity: 1;
   transform: none;
-  transition: opacity 1s ease-in-out;
+  transition: none;
   z-index: 1;
 }
 .hero-slider .slide {
@@ -291,13 +291,7 @@ header.scrolled .nav-links li a.active {
   box-shadow: 0 8px 20px rgba(255, 179, 0, 0.3);
 }
 .slider-controls {
-  position: absolute;
-  bottom: 18px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  gap: 0.5rem;
-  z-index: 5;
+  display: none !important;
 }
 .slider-controls .dot {
   width: 13px;

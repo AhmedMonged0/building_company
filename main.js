@@ -62,11 +62,49 @@ if (aboutContents.length) {
 
 // Hero video - single video without slider logic
 const video = document.querySelector('.hero-slider video');
-if (video) {
+const heroSlider = document.querySelector('.hero-slider');
+
+if (heroSlider && video) {
+  // إزالة أي صور قد تكون موجودة
+  const images = heroSlider.querySelectorAll('img');
+  images.forEach(img => img.remove());
+  
+  // إزالة أي عناصر slide أخرى غير الفيديو
+  const slides = heroSlider.querySelectorAll('.slide');
+  slides.forEach(slide => {
+    if (slide.tagName !== 'VIDEO') {
+      slide.remove();
+    }
+  });
+  
+  // إزالة نقاط التحكم إن وجدت
+  const sliderControls = document.querySelector('.slider-controls');
+  if (sliderControls) {
+    sliderControls.remove();
+  }
+  
   // تأكد من أن الفيديو يعمل بشكل طبيعي
   video.addEventListener('loadeddata', function() {
     this.play();
   });
+  
+  // تأكد من أن الفيديو له class active
+  video.classList.add('slide', 'active');
+  
+  // مراقبة أي تغييرات في المحتوى وإزالة الصور
+  const observer = new MutationObserver(function(mutations) {
+    mutations.forEach(function(mutation) {
+      mutation.addedNodes.forEach(function(node) {
+        if (node.nodeType === 1) { // Element node
+          if (node.tagName === 'IMG' || (node.classList && node.classList.contains('slide') && node.tagName !== 'VIDEO')) {
+            node.remove();
+          }
+        }
+      });
+    });
+  });
+  
+  observer.observe(heroSlider, { childList: true, subtree: true });
 }
 
 // Navbar background on scroll
